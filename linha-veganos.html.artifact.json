@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "besco-site/linha-veganos.html",
+  "entry": "besco-site/linha-veganos.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-06-29T02:31:25.338Z",
+  "updatedAt": "2026-06-29T02:31:25.338Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

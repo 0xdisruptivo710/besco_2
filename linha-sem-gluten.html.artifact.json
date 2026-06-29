@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "besco-site/linha-sem-gluten.html",
+  "entry": "besco-site/linha-sem-gluten.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-06-29T02:31:25.311Z",
+  "updatedAt": "2026-06-29T02:31:25.311Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

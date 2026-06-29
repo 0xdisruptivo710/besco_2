@@ -28,6 +28,8 @@
   .scroll-arrow { animation: scrollArrow 1.6s ease-in-out infinite; }
   .hero-nav a { font-family: 'Fredoka', sans-serif; color: #27273d; text-shadow: 0 1px 8px rgba(255,255,255,0.6); transition: color .2s ease; }
   .hero-nav a:hover { color: #03914a; }
+  /* esconde a headline da hero no mobile (fica apertada sobre a órbita) */
+  @media (max-width: 768px) { .hero-headline { display: none !important; } }
 </style>
 
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
@@ -317,7 +319,7 @@
 
                 {/* CTA revenda (canto inferior direito) */}
                 <div className="absolute bottom-12 right-[6vw] md:right-[8vw] flex flex-col items-start z-10 pointer-events-auto" style={{ maxWidth: "330px" }}>
-                  <motion.p style={{ y: yElement, filter: filterText, opacity: textOpacity, fontFamily: DISPLAY, fontWeight: 600, fontSize: "clamp(18px,2vw,24px)", color: INK, lineHeight: 1.2, marginBottom: "16px" }}>
+                  <motion.p className="hero-headline" style={{ y: yElement, filter: filterText, opacity: textOpacity, fontFamily: DISPLAY, fontWeight: 600, fontSize: "clamp(18px,2vw,24px)", color: INK, lineHeight: 1.2, marginBottom: "16px" }}>
                     Biscoitos com propósito e <span style={{ color: GREEN }}>muuuito sabor.</span>
                   </motion.p>
                   <motion.div className="flex flex-wrap gap-3 items-center pointer-events-auto" style={{ y: yElement, filter: filterText, opacity: textOpacity }}>
