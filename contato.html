@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Contato · Bêsco</title>
+<link rel="stylesheet" href="besco.css" />
+<style>
+  /* contato — módulo de contato (formulário + canais), sem pilha de cards */
+  .contact-grid { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 64px; align-items: start; }
+  .contact-grid h2 { font-size: clamp(1.9rem, 4vw, 2.8rem); margin-bottom: 14px; }
+  .contact-grid .intro { color: var(--azul-cinza); max-width: 520px; margin-bottom: 30px; font-size: 1.04rem; }
+  .ways-title { font-family: var(--font-display); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--azul-cinza); margin-bottom: 6px; }
+  .ways { display: grid; }
+  .way { display: grid; grid-template-columns: 168px 1fr; gap: 20px; padding: 24px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .way:first-of-type { border-top: 1px solid var(--line); }
+  .way .k { font-family: var(--font-display); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--azul-cinza); }
+  .way .v { font-size: 1.06rem; color: var(--indigo); line-height: 1.5; }
+  .way .v a { color: var(--verde-folha); font-weight: 700; }
+  .way .v a:hover { text-decoration: underline; }
+  .way-note { margin-top: 22px; font-size: 0.84rem; color: var(--azul-cinza); }
+  @media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; gap: 44px; } }
+  @media (max-width: 560px) { .way { grid-template-columns: 1fr; gap: 4px; } }
+</style>
+</head>
+<body>
+
+<header class="site-header"><div class="wrap bar">
+  <a class="brand" href="index.html"><img src="mqy7fmq2-besco_logo.png" alt="Bêsco"></a>
+  <nav class="nav"><a href="linhas.html">As linhas</a><a href="sobre.html">Nossa história</a><a href="revender.html">Revender</a><a href="contato.html" aria-current="page">Contato</a></nav>
+  <a class="pill" href="revender.html">Quero revender</a>
+</div></header>
+
+<section class="page-hero"><div class="wrap">
+  <div>
+    <p class="eyebrow">Contato</p>
+    <h1>Fale com<br>a <em>gente</em></h1>
+    <p class="lead">Dúvidas, parcerias ou revenda: a Bêsco fica em Rio do Sul (SC) e atende o Brasil inteiro. A gente responde rápido.</p>
+    <div class="acts">
+      <a class="pill pill-amarelo" href="https://wa.me/554733001810" target="_blank" rel="noreferrer">Chamar no WhatsApp</a>
+      <a class="pill pill-outline" href="revender.html">Quero revender</a>
+    </div>
+  </div>
+  <div class="hero-photo"><img src="mqy6a2i2-amo.besco_1615399075_2526473021935200951_37765778252.jpg" alt="Biscoitos Bêsco"></div>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="contact-grid">
+
+    <div>
+      <h2 class="serif">Envie sua <em>mensagem</em></h2>
+      <p class="intro">Conte o que você precisa. Para revenda, diga também a sua cidade que a gente retorna com a tabela de atacado e o kit de demonstração.</p>
+      <form class="form" onsubmit="event.preventDefault(); this.querySelector('.ok').style.display='block';">
+        <div class="row">
+          <div class="field"><label>Nome</label><input type="text" placeholder="Seu nome" required></div>
+          <div class="field"><label>E-mail</label><input type="email" placeholder="seu@email.com.br" required></div>
+        </div>
+        <div class="field"><label>Assunto</label>
+          <select><option>Dúvida sobre produtos</option><option>Quero revender</option><option>Atacado / indústria</option><option>Imprensa</option><option>Outro</option></select>
+        </div>
+        <div class="field"><label>Mensagem</label><textarea rows="4" placeholder="Como podemos ajudar?"></textarea></div>
+        <button class="btn" type="submit">Enviar mensagem →</button>
+        <p class="ok" style="display:none; color:var(--verde-folha); font-weight:800; font-size:14px;">Mensagem enviada! Logo retornamos o seu contato.</p>
+      </form>
+    </div>
+
+    <aside>
+      <div class="ways-title">Outras formas de falar</div>
+      <div class="ways">
+        <div class="way"><div class="k">WhatsApp e telefone</div><div class="v"><a href="tel:+554733001810">(47) 3300-1810</a></div></div>
+        <div class="way"><div class="k">Onde estamos</div><div class="v">Tv. Alagoas, 11, Boa Vista<br>Rio do Sul - SC, 89167-200</div></div>
+        <div class="way"><div class="k">Instagram</div><div class="v"><a href="https://instagram.com/amo.besco" target="_blank" rel="noreferrer">@amo.besco</a></div></div>
+        <div class="way"><div class="k">É lojista?</div><div class="v">Veja as condições de <a href="revender.html">revenda e atacado</a>.</div></div>
+      </div>
+      <p class="way-note">Besco Industrial de Alimentos Ltda. · CNPJ 14.133.092/0001-92</p>
+    </aside>
+
+  </div>
+</div></section>
+
+<footer class="site-footer"><div class="wrap">
+  <div class="foot-brand"><img class="seal" src="mqy7fmq3-images.jpg" alt="Bêsco"><div><div class="serif">Bêsco</div><div class="sub">biscoitos com propósito</div></div></div>
+  <div class="foot-cols">
+    <div><h4>A Bêsco</h4><a href="sobre.html">Nossa história</a><a href="sobre.html">Nosso propósito</a><a href="linhas.html">As linhas</a><a href="contato.html">Onde encontrar</a></div>
+    <div><h4>As linhas</h4><a href="linha-sem-gluten.html">Sem glúten</a><a href="linha-sem-leite.html">Sem leite</a><a href="linha-sem-acucar.html">Sem açúcar</a><a href="linha-veganos.html">Veganos</a><a href="linha-tradicionais.html">Tradicionais</a><a href="linha-integral.html">Integral</a></div>
+    <div><h4>Revenda</h4><a href="revender.html">Quero revender</a><a href="revender.html">Atacado e indústria</a><a href="contato.html">Onde encontrar</a><a href="contato.html">WhatsApp</a></div>
+    <div><h4>Siga</h4><a href="https://instagram.com/amo.besco" target="_blank" rel="noreferrer">Instagram @amo.besco</a><a href="contato.html">WhatsApp</a><a href="contato.html">TikTok</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 Bêsco · Biscoitos com propósito</span><span>PT-BR · BR</span></div>
+  <div class="legal">Besco Industrial de Alimentos Ltda. · CNPJ 14.133.092/0001-92<br>Tv. Alagoas, 11, Boa Vista, Rio do Sul - SC, 89167-200<br>(47) 3300-1810</div>
+</div></footer>
+
+</body>
+</html>

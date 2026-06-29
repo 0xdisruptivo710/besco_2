@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bêsco — Biscoitos com propósito</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="besco.css" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { fontFamily: { serif: ['"Fredoka"', "sans-serif"], sans: ["Nunito", "sans-serif"] } } } };
+</script>
+
+<style>
+  :root { --reveal: #f7f1e6; }
+  .orbit-container { position: relative; margin-left: auto; margin-right: auto; }
+  .orbit-scaling-container { width: 100%; height: 100%; position: relative; }
+  .orbit-scaling-container--responsive { position: absolute; left: 50%; top: 50%; transform-origin: center center; }
+  .orbit-rotation-wrapper { width: 100%; height: 100%; transform-origin: center center; position: relative; }
+  .orbit-path-svg { position: absolute; inset: 0; pointer-events: none; }
+  .orbit-item { position: absolute; will-change: transform; user-select: none; }
+  .orbit-image { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 5px solid #fffdf8; box-shadow: 0 18px 40px rgba(39,39,61,0.22); }
+  @keyframes scrollArrow { 0% { transform: translateY(-6px); opacity: 0; } 40% { opacity: 1; } 100% { transform: translateY(10px); opacity: 0; } }
+  .scroll-arrow { animation: scrollArrow 1.6s ease-in-out infinite; }
+  .hero-nav a { font-family: 'Fredoka', sans-serif; color: #27273d; text-shadow: 0 1px 8px rgba(255,255,255,0.6); transition: color .2s ease; }
+  .hero-nav a:hover { color: #03914a; }
+</style>
+
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="module">
+  import React from "https://esm.sh/react@18.3.1";
+  import * as ReactDOMClient from "https://esm.sh/react-dom@18.3.1/client?deps=react@18.3.1";
+  import * as FM from "https://esm.sh/framer-motion@11.18.2?deps=react@18.3.1,react-dom@18.3.1";
+  window.React = React; window.ReactDOM = ReactDOMClient; window.FM = FM;
+  window.__depsReady = true; window.dispatchEvent(new Event("deps-ready"));
+</script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react">
+(function () {
+  const start = () => {
+    const { useRef, useState, useEffect } = React;
+    const { createRoot } = ReactDOM;
+    const { motion, useScroll, useTransform, useMotionTemplate, useMotionValue, useAnimationFrame, animate } = window.FM;
+
+    const INK = "#27273d", GREEN = "#00b564", DISPLAY = "'Fredoka', sans-serif", BODY = "'Nunito', sans-serif";
+    const LOGO = "mqy7fmq2-besco_logo.png", SEAL = "mqy7fmq3-images.jpg";
+
+    const LINES = [
+      { title: "Sem Glúten", href: "linha-sem-gluten.html", tag: "sem glúten", img: "mqy6au1o-amo.besco_1624731942_2604762780712991427_37765778252.jpg", short: "Integral, leve e crocante — para quem evita o glúten sem abrir mão do sabor." },
+      { title: "Sem Leite", href: "linha-sem-leite.html", tag: "sem lactose", img: "mqy6ammv-amo.besco_1617968263_2548024929573371317_37765778252.jpg", short: "Zero lactose e zero leite, com a mesma maciez de sempre. Pensado para intolerantes." },
+      { title: "Sem Açúcar", href: "linha-sem-acucar.html", tag: "diabéticos", img: "mqy6au02-amo.besco_1622026063_2582064221664556464_37765778252.jpg", short: "Adoçado de forma natural, ideal para diabéticos e para quem reduz o açúcar." },
+      { title: "Veganos", href: "linha-veganos.html", tag: "100% vegetal", img: "mqy6a2d2-amo.besco_1614095580_2515538510657943192_37765778252.jpg", short: "Sem nenhum ingrediente de origem animal. Cuidado em cada detalhe." },
+      { title: "Tradicionais", href: "linha-tradicionais.html", tag: "clássico", img: "mqy6a2i2-amo.besco_1615399075_2526473021935200951_37765778252.jpg", short: "O clássico Bêsco: massa artesanal e ingredientes que você reconhece." },
+      { title: "Linha Integral", href: "linha-integral.html", tag: "integral", img: "mqy6a1vk-amo.besco_1615458846_2526974414672439094_37765778252.jpg", short: "Grãos integrais selecionados, sem conservantes e sem nada difícil de pronunciar." }
+    ];
+
+    /* ===================== Orbit ===================== */
+    function generateEllipsePath(cx, cy, rx, ry) { return `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 0 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 0 ${cx - rx} ${cy}`; }
+
+    function OrbitItem({ item, title, desc, index, totalItems, pathValue, itemSizeValue, rotationValue, progress, fill, scaleStrength, focalPoint = 50 }) {
+      const itemOffset = fill ? index / totalItems * 100 : 0;
+      const offsetPercentage = useTransform(progress, (p) => (((p + itemOffset) % 100) + 100) % 100);
+      const offsetDistance = useTransform(offsetPercentage, (p) => `${p}%`);
+      const itemScale = useTransform(() => {
+        const rawPos = offsetPercentage.get(); const strength = scaleStrength ? scaleStrength.get() : 0;
+        let dist = Math.abs(rawPos - focalPoint); if (dist > 50) dist = 100 - dist;
+        let targetScale = 1;
+        if (dist < 20) { const ratio = dist / 20; targetScale = 0.4 + ((Math.cos(ratio * Math.PI) + 1) / 2) * 0.6; } else { targetScale = 0.4; }
+        return 1 - strength * (1 - targetScale);
+      });
+      const offsetPath = useMotionTemplate`path("${pathValue}")`;
+      const zIndexMV = useTransform(itemScale, (s) => Math.round(s * 100));
+      const counterRotate = useTransform(rotationValue, (r) => `rotate(${-r}deg)`);
+      const labelOpacity = useTransform(scaleStrength || useMotionValue(0), (s) => s);
+      return (
+        <motion.div className="orbit-item" style={{ width: itemSizeValue, height: itemSizeValue, offsetPath, offsetRotate: "0deg", offsetAnchor: "center center", offsetDistance, scale: itemScale, zIndex: zIndexMV, pointerEvents: "auto" }}>
+          <motion.div style={{ transform: counterRotate, width: "100%", height: "100%", position: "relative" }}>
+            {item}
+            {(title || desc) &&
+              <motion.div style={{ position: "absolute", left: "115%", top: "50%", transform: "translateY(-50%)", width: "min(360px, 95%)", opacity: labelOpacity, pointerEvents: "none", fontFamily: BODY }}>
+                <div style={{ fontFamily: DISPLAY, fontWeight: 600, fontSize: "clamp(26px, 3vw, 38px)", lineHeight: 1.05, marginBottom: "12px", color: INK }}>{title}</div>
+                <div style={{ fontFamily: BODY, fontWeight: 400, fontSize: "clamp(13px, 1vw, 15px)", lineHeight: 1.5, color: "rgba(39,39,61,0.72)", marginBottom: "12px" }}>{desc}</div>
+                <span style={{ fontFamily: DISPLAY, fontWeight: 600, fontSize: "14px", color: GREEN }}>Ver a linha →</span>
+              </motion.div>}
+          </motion.div>
+        </motion.div>
+      );
+    }
+
+    function OrbitImages({ images = [], baseWidth = 800, fill = true, progressOverride, radiusXOverride, radiusYOverride, itemSizeOverride, rotationOverride, translateXOverride, focusStrength }) {
+      const containerRef = useRef(null);
+      const [scale, setScale] = useState(1);
+      const cX = baseWidth / 2, cY = baseWidth / 2;
+      const rX = radiusXOverride, rY = radiusYOverride, iS = itemSizeOverride, rot = rotationOverride, tX = translateXOverride;
+      const pathValue = useTransform([rX, rY], ([a, b]) => generateEllipsePath(cX, cY, a, b));
+      useEffect(() => {
+        if (!containerRef.current) return;
+        const upd = () => { if (containerRef.current) setScale(containerRef.current.clientWidth / baseWidth); };
+        upd(); const ob = new ResizeObserver(upd); ob.observe(containerRef.current); return () => ob.disconnect();
+      }, [baseWidth]);
+      const items = images.map((entry, index) => {
+        const img = <motion.img key={entry.src} src={entry.src} alt={entry.title} draggable={false} className="orbit-image" whileHover={{ scale: 1.12 }} transition={{ duration: 0.3 }} style={{ cursor: "pointer", pointerEvents: "auto" }} />;
+        return entry.href ? <a key={entry.src} href={entry.href} style={{ display: "block", width: "100%", height: "100%" }} aria-label={entry.title}>{img}</a> : img;
+      });
+      return (
+        <div ref={containerRef} className="orbit-container" style={{ width: "100%", height: "auto", aspectRatio: "1 / 1" }}>
+          <div className="orbit-scaling-container orbit-scaling-container--responsive" style={{ width: baseWidth, height: baseWidth, transform: `translate(-50%, -50%) scale(${scale})` }}>
+            <motion.div className="orbit-rotation-wrapper" style={{ rotate: rot, x: tX }}>
+              {items.map((item, index) => (
+                <OrbitItem key={index} item={item} title={images[index].title} desc={images[index].short} index={index} totalItems={items.length}
+                  pathValue={pathValue} itemSizeValue={iS} rotationValue={rot} progress={progressOverride} fill={fill} scaleStrength={focusStrength} focalPoint={50} />
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ===================== Sections ===================== */
+    const blurUp = { initial: { opacity: 0, y: 40, filter: "blur(18px)" }, whileInView: { opacity: 1, y: 0, filter: "blur(0px)" }, viewport: { once: true, amount: 0.3 }, transition: { duration: 0.9, ease: "easeOut" } };
+
+    function Intro() {
+      return (
+        <section className="block alt">
+          <div className="wrap split">
+            <div>
+              <motion.div {...blurUp}>
+                <p className="eyebrow">Prazer, somos a Bêsco</p>
+                <h2 style={{ fontSize: "clamp(2rem,4.4vw,3.1rem)" }}>Cada biscoito nasce<br />com um <em style={{ color: GREEN, fontStyle: "normal" }}>propósito</em></h2>
+                <div className="prose" style={{ marginTop: "18px" }}>
+                  <p>Temos opções para <strong>alérgicos, diabéticos e veganos</strong> — ou para quem só quer um biscoito incrível: integral, sem glúten, sem conservantes e sem ingredientes difíceis de pronunciar.</p>
+                  <p>Receitas próprias, matéria-prima de excelência e cuidado artesanal em cada detalhe. <strong>Biscoitos com propósito e muuuito sabor.</strong></p>
+                </div>
+                <div className="chips" style={{ marginTop: "22px" }}>
+                  <span className="chip solid">sem glúten</span><span className="chip">sem leite</span><span className="chip gold">sem açúcar</span><span className="chip">veganos</span><span className="chip">integral</span>
+                </div>
+              </motion.div>
+            </div>
+            <motion.img {...blurUp} src="mqy6au02-amo.besco_1622026063_2582064221664556464_37765778252.jpg" alt="Biscoitos Bêsco na tábua" style={{ borderRadius: "22px", width: "100%", objectFit: "cover", boxShadow: "0 24px 60px -22px rgba(39,39,61,0.45)" }} />
+          </div>
+        </section>
+      );
+    }
+
+    function LinesShowcase() {
+      return (
+        <section className="block">
+          <div className="wrap">
+            <motion.div {...blurUp} className="section-head">
+              <p className="eyebrow">As linhas</p>
+              <h2>Um biscoito para <em>cada</em> propósito</h2>
+              <p>Seis linhas, um só cuidado. Clique para conhecer cada receita — todas integrais, sem conservantes e com sabor de verdade.</p>
+            </motion.div>
+            <div className="grid-lines">
+              {LINES.map((l) => (
+                <motion.a {...blurUp} className="line-card" href={l.href} key={l.href}>
+                  <div className="ph"><span className="tagtop">{l.tag}</span><img src={l.img} alt={l.title} /></div>
+                  <div className="body"><h3>{l.title}</h3><p>{l.short}</p><span className="more">Ver a linha →</span></div>
+                </motion.a>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    function Resellers() {
+      const benefits = [
+        ["%", "Margem justa", "Condições pensadas para o revendedor lucrar de verdade."],
+        ["24h", "Logística pronta", "Parceria de transporte: enviamos para São Paulo em 24h e para todo o Brasil."],
+        ["5×", "Pronta para crescer", "Indústria própria com fôlego para quintuplicar a produção."],
+        ["★", "Kit de venda", "Amostras e material de apoio para você vender com facilidade."]
+      ];
+      return (
+        <section className="reseller">
+          <div className="wrap">
+            <motion.div {...blurUp}>
+              <p className="eyebrow" style={{ color: "#fff" }}>Para revendedores e lojistas</p>
+              <h2>Leve a Bêsco para a sua <em>loja</em></h2>
+              <p>Somos uma indústria pronta para abastecer o seu ponto de venda com margem justa, logística rápida e uma linha que atende todo mundo.</p>
+              <div className="acts">
+                <a className="pill pill-light" href="revender.html">Quero revender</a>
+                <a className="pill pill-outline" href="revender.html">Falar com o time →</a>
+              </div>
+            </motion.div>
+            <motion.div {...blurUp} className="res-list">
+              {benefits.map(([ic, t, d]) => (
+                <div className="res-item" key={t}><div className="ic">{ic}</div><div><b>{t}</b><span>{d}</span></div></div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      );
+    }
+
+    function Quality() {
+      const facts = [["15 anos", "de mercado, sempre artesanal"], ["6 linhas", "para cada necessidade"], ["24h", "de envio para São Paulo"], ["0", "conservantes na receita"]];
+      return (
+        <section className="block alt">
+          <div className="wrap">
+            <motion.div {...blurUp} className="section-head"><p className="eyebrow">Feito com propósito</p><h2>Qualidade que você <em>reconhece</em></h2><p>Pesquisamos, selecionamos matérias-primas de excelência e desenvolvemos receitas próprias — pensadas em cada detalhe.</p></motion.div>
+            <div className="facts">{facts.map(([n, d]) => (<motion.div {...blurUp} className="fact" key={n}><div className="n">{n}</div><div className="d">{d}</div></motion.div>))}</div>
+          </div>
+        </section>
+      );
+    }
+
+    function QuoteBlock() {
+      return (
+        <section className="block cream">
+          <div className="wrap">
+            <motion.p {...blurUp} className="quote-big">“Uma marca de biscoitos que busca proporcionar uma vida com <em>mais sabor</em> a todos. Não tem nada igual a um Bêsco.”</motion.p>
+          </div>
+        </section>
+      );
+    }
+
+    function Ticker() {
+      const words = ["sem glúten", "sem leite", "sem açúcar", "veganos", "tradicionais", "100% integrais"];
+      const set = words.map((w, i) => <span key={i}>{w}</span>);
+      return <div className="ticker" aria-hidden="true"><div className="ticker-track">{set}{set}</div></div>;
+    }
+
+    function Footer() {
+      return (
+        <footer className="site-footer">
+          <div className="wrap">
+            <div className="foot-brand">
+              <img className="seal" src={SEAL} alt="Selo Bêsco" />
+              <div><div className="serif">Bêsco</div><div className="sub">biscoitos com propósito</div></div>
+            </div>
+            <div className="foot-cols">
+              <div><h4>A Bêsco</h4><a href="sobre.html">Nossa história</a><a href="sobre.html">Nosso propósito</a><a href="linhas.html">As linhas</a><a href="contato.html">Onde encontrar</a></div>
+              <div><h4>As linhas</h4><a href="linha-sem-gluten.html">Sem glúten</a><a href="linha-sem-leite.html">Sem leite</a><a href="linha-sem-acucar.html">Sem açúcar</a><a href="linha-veganos.html">Veganos</a><a href="linha-tradicionais.html">Tradicionais</a><a href="linha-integral.html">Integral</a></div>
+              <div><h4>Revenda</h4><a href="revender.html">Quero revender</a><a href="revender.html">Atacado e indústria</a><a href="contato.html">Onde encontrar</a><a href="contato.html">WhatsApp</a></div>
+              <div><h4>Siga</h4><a href="https://instagram.com/amo.besco" target="_blank" rel="noreferrer">Instagram @amo.besco</a><a href="contato.html">WhatsApp</a><a href="contato.html">TikTok</a></div>
+            </div>
+            <div className="foot-bottom"><span>© 2026 Bêsco — Biscoitos com propósito</span><span>PT-BR · BR</span></div>
+            <div className="legal">Indústria Brasileira · Besco Industrial de Alimentos Ltda. · CNPJ 14.133.092/0001-92<br />Tv. Alagoas, 11 – Boa Vista, Rio do Sul – SC, 89167-200 · (47) 3300-1810</div>
+          </div>
+        </footer>
+      );
+    }
+
+    /* ===================== App ===================== */
+    const orbitImagesData = LINES.map((l) => ({ src: l.img, title: l.title, short: l.short, href: l.href }));
+    const VIDEO_SRC = "mqy6amlh-amo.besco_1617967935_2548022133314742785_37765778252.mp4";
+    const VIDEO_POSTER = "mqy6ammv-amo.besco_1617968263_2548024929573371317_37765778252.jpg";
+    const TARGET_RADIUS = 650;
+
+    function App() {
+      const containerRef = useRef(null);
+      const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
+      const rx = useTransform(scrollYProgress, [0, 0.08, 1], ["0%", "55%", "55%"]);
+      const ry = useTransform(scrollYProgress, [0, 0.08, 1], ["0%", "55%", "55%"]);
+      const clipPath = useMotionTemplate`ellipse(${rx} ${ry} at 50% 50%)`;
+      const textOpacity = useTransform(scrollYProgress, [0.03, 0.08, 0.15, 0.22, 0.90, 0.98, 1], [0, 1, 1, 0, 0, 1, 1]);
+      const textBlurVal = useTransform(scrollYProgress, [0.03, 0.08, 0.15, 0.22, 0.90, 0.98, 1], [15, 0, 0, 15, 15, 0, 0]);
+      const filterText = useMotionTemplate`blur(${textBlurVal}px)`;
+      const yElement = useTransform(scrollYProgress, [0.03, 0.08, 0.15, 0.22, 0.90, 0.98, 1], [20, 0, 0, 20, 20, 0, 0]);
+      const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.03, 0.08], [1, 1, 0]);
+      const orbitItemSize = useTransform(scrollYProgress, [0.15, 0.25, 0.85, 0.95, 1], [80, 360, 360, 80, 80]);
+      const orbitRx = useTransform(scrollYProgress, [0.15, 0.25, 0.85, 0.95, 1], [330, TARGET_RADIUS, TARGET_RADIUS, 330, 330]);
+      const orbitRy = useTransform(scrollYProgress, [0.15, 0.25, 0.85, 0.95, 1], [140, TARGET_RADIUS, TARGET_RADIUS, 140, 140]);
+      const orbitRotation = useTransform(scrollYProgress, [0.15, 0.25, 0.85, 0.95, 1], [-15, 0, 0, -15, -15]);
+      const orbitTx = useTransform(scrollYProgress, [0.15, 0.25, 0.85, 0.95, 1], [0, -(TARGET_RADIUS + 200), -(TARGET_RADIUS + 200), 0, 0]);
+      const focusStrength = useTransform(scrollYProgress, [0.15, 0.25, 0.85, 0.95, 1], [0, 1, 1, 0, 0]);
+      const orbitProgress = useMotionValue(0); const prevScroll = useRef(0);
+      useAnimationFrame((time, delta) => {
+        const pos = scrollYProgress.get(); const d = pos - prevScroll.current; prevScroll.current = pos;
+        let fs = 0; if (pos > 0.15 && pos < 0.85) { fs = d * 200; } else { fs = delta / 1000 * 2.5; }
+        orbitProgress.set(orbitProgress.get() + fs);
+      });
+
+      return (
+        <>
+          <div ref={containerRef} className="relative w-full h-[600vh]" style={{ background: "#16161f" }}>
+            <div className="sticky top-0 w-full h-screen overflow-hidden text-white">
+              <video autoPlay loop muted playsInline poster={VIDEO_POSTER} className="absolute inset-0 w-full h-full object-cover z-0">
+                <source src={VIDEO_SRC} type="video/mp4" />
+              </video>
+
+              {/* Logotipo removido da hero — já aparece no cabeçalho */}
+
+              {/* Indicador de rolagem */}
+              <motion.div className="absolute z-10 left-1/2 -translate-x-1/2 flex flex-col items-center text-white select-none pointer-events-none" style={{ bottom: "40px", opacity: scrollHintOpacity }}>
+                <div className="relative w-[20px] h-[34px] overflow-hidden">
+                  <svg className="scroll-arrow absolute inset-0" width="20" height="34" viewBox="0 0 20 34" fill="none" aria-hidden="true"><path d="M10 4 V28 M3 21 L10 28 L17 21" stroke="#ffffff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </div>
+              </motion.div>
+
+              {/* Revelação clip-path com a órbita (clicável) */}
+              <motion.div className="absolute z-20 flex items-center justify-center overflow-hidden" style={{ clipPath, rotate: -15, width: "150vw", height: "150vh", left: "-25vw", top: "-25vh" }}>
+                <div className="absolute inset-0" style={{ background: "var(--reveal)" }} />
+                <div className="relative flex flex-col items-center justify-center" style={{ width: "100vw", height: "100vh", transform: "rotate(15deg)" }}>
+                  <motion.div className="w-[90vw] max-w-[1200px] aspect-square relative z-0">
+                    <OrbitImages images={orbitImagesData} baseWidth={800} fill={true} progressOverride={orbitProgress} radiusXOverride={orbitRx} radiusYOverride={orbitRy} itemSizeOverride={orbitItemSize} rotationOverride={orbitRotation} translateXOverride={orbitTx} focusStrength={focusStrength} />
+                  </motion.div>
+                </div>
+              </motion.div>
+
+              {/* Overlays (sem números) */}
+              <div className="absolute inset-0 z-[60] pointer-events-none">
+                {/* Selo central */}
+                <div className="absolute top-[47%] left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-50">
+                  <motion.div className="flex flex-col items-center pointer-events-auto" style={{ filter: filterText, opacity: textOpacity, transform: "translateZ(0)" }}>
+                    <img src={SEAL} alt="Bêsco" style={{ width: "clamp(150px, 16vw, 230px)", borderRadius: "50%", boxShadow: "0 18px 50px rgba(39,39,61,0.30)" }} />
+                  </motion.div>
+                </div>
+
+                {/* CTA revenda (canto inferior direito) */}
+                <div className="absolute bottom-12 right-[6vw] md:right-[8vw] flex flex-col items-start z-10 pointer-events-auto" style={{ maxWidth: "330px" }}>
+                  <motion.p style={{ y: yElement, filter: filterText, opacity: textOpacity, fontFamily: DISPLAY, fontWeight: 600, fontSize: "clamp(18px,2vw,24px)", color: INK, lineHeight: 1.2, marginBottom: "16px" }}>
+                    Biscoitos com propósito e <span style={{ color: GREEN }}>muuuito sabor.</span>
+                  </motion.p>
+                  <motion.div className="flex flex-wrap gap-3 items-center pointer-events-auto" style={{ y: yElement, filter: filterText, opacity: textOpacity }}>
+                    <a href="revender.html" className="pill">Quero revender</a>
+                    <a href="linhas.html" style={{ fontFamily: DISPLAY, fontWeight: 600, fontSize: "15px", color: GREEN }}>Ver as linhas →</a>
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Cabeçalho */}
+              <motion.header className="absolute top-0 left-0 w-full px-6 md:px-12 py-5 md:py-6 flex justify-between items-center z-[100] pointer-events-none" style={{ opacity: scrollHintOpacity }}>
+                <a href="index.html" className="pointer-events-auto select-none" aria-label="Bêsco — início">
+                  <img src={LOGO} alt="Bêsco" style={{ height: "clamp(30px, 3.4vw, 42px)", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.30))" }} />
+                </a>
+                <nav className="hero-nav hidden md:flex items-center gap-8 pointer-events-auto" style={{ fontSize: "0.95rem", fontWeight: 500 }}>
+                  <a href="linhas.html">As linhas</a><a href="sobre.html">Nossa história</a><a href="revender.html">Revender</a><a href="contato.html">Contato</a>
+                </nav>
+                <a href="revender.html" className="pill pointer-events-auto"><span className="hidden sm:inline">Quero revender</span><span className="sm:hidden">Revender</span></a>
+              </motion.header>
+            </div>
+          </div>
+
+          <Intro />
+          <LinesShowcase />
+          <Resellers />
+          <Quality />
+          <QuoteBlock />
+          <Ticker />
+          <Footer />
+        </>
+      );
+    }
+
+    createRoot(document.getElementById("root")).render(<App />);
+  };
+  if (window.__depsReady) start();
+  else window.addEventListener("deps-ready", start, { once: true });
+})();
+  </script>
+</body>
+</html>
