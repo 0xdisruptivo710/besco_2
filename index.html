@@ -285,9 +285,8 @@
         <>
           <div ref={containerRef} className="relative w-full h-[600vh]" style={{ background: "#16161f" }}>
             <div className="sticky top-0 w-full h-screen overflow-hidden text-white">
-              <video autoPlay loop muted playsInline poster={VIDEO_POSTER} className="absolute inset-0 w-full h-full object-cover z-0">
-                <source src={VIDEO_SRC} type="video/mp4" />
-              </video>
+              {/* Fundo da hero — foto limpa. O vídeo promo tinha o letreiro "1,2,3,4,5,6..." queimado; trocado por still sem texto. */}
+              <img src={VIDEO_POSTER} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover z-0" />
 
               {/* Logotipo removido da hero — já aparece no cabeçalho */}
 
